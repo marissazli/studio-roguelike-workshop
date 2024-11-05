@@ -53,7 +53,65 @@ public class MapGenerator : MonoBehaviour
             Vector2Int current = stack.Pop();
 
             // code here
+            if (map.Get(current.x, current.y).Type == MapEntryType.Empty)
+            {
+                continue;
+            }
+
+            int neighborsFilled = 0;
+            for (int i = 0; i < neighborOffsets.Count; i++)
+            {
+                if(map.Get(current.x + neighborOffsets[i][0], current.y + neighborOffsets[i][1]).Type != MapEntryType.Empty)
+                {
+                    neighborsFilled++;
+                }
+            }
+            if (neighborsFilled > 1)
+            {
+                continue;
+            }
+
+            if (current == startCell)
+            {
+                map.Get(current.x, current.y).Type = MapEntryType.StartRoom;
+            }
+            else if (numRooms >= minRooms)
+            {
+                if (Random.value < failChance)
+                {
+                    map.Get(current.x, current.y).Type = MapEntryType.BossRoom;
+                }
+                else
+                {
+                    if(Random.value < itemChance)
+                    {
+                        map.Get(current.x, current.y).Type = MapEntryType.ItemRoom;
+                    }
+                    else
+                    {
+                        map.Get(current.x, current.y).Type = MapEntryType.NormalRoom;
+                    }
+                    
+                }
+            }
+            else if (stack.Count == 1)
+            {
+                map.Get(current.x, current.y).Type = MapEntryType.BossRoom;
+            }
+            else
+            {
+                if (Random.value < itemChance)
+                {
+                    map.Get(current.x, current.y).Type = MapEntryType.ItemRoom;
+                }
+                else
+                {
+                    map.Get(current.x, current.y).Type = MapEntryType.NormalRoom;
+                }
+            }
+            numRooms++;
         }
+
         return map;
     }
 }
